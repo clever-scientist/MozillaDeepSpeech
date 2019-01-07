@@ -24,6 +24,6 @@ def maybe_download(archive_name, target_dir, archive_url):
                 done += len(data)
                 f.write(data)
                 bar.update(done)
-    else:
-        print('Found archive "%s" - not downloading.' % archive_path)
+    #else:
+        #print('Found archive "%s" - not downloading.' % archive_path)
     return archive_path
