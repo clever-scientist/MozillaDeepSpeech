@@ -10,11 +10,11 @@ def maybe_download(archive_name, target_dir, archive_url):
     archive_path = path.join(target_dir, archive_name)
 
     if not path.exists(target_dir):
-        print('No path "%s" - creating ...' % target_dir)
+        #print('No path "%s" - creating ...' % target_dir)
         makedirs(target_dir)
 
     if not path.exists(archive_path):
-        print('No archive "%s" - downloading...' % archive_path)
+        #print('No archive "%s" - downloading...' % archive_path)
         req = requests.get(archive_url, stream=True)
         total_size = int(req.headers.get('content-length', 0))
         done = 0
