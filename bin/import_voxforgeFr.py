@@ -164,19 +164,19 @@ def _download_and_preprocess_data(data_dir):
     test_files = _generate_dataset(data_dir, "test")
     test_files.to_csv(path.join(data_dir, "voxforge-test.csv"), index=False)
     print("3.1 Test files were generated - {} Files - {} Hours - {} Texts".format(len(test_files.index),
-                                                                                  test_files['wav_filesize'].sum(),
+                                                                                  test_files['wav_filesize'].sum()/(32000*60*60),
                                                                                   test_files['transcript'].nunique()))
 
     dev_files = _generate_dataset(data_dir, "dev")
     dev_files.to_csv(path.join(data_dir, "voxforge-dev.csv"), index=False)
     print("3.2 Dev files were generated - {} Files - {} Hours - {} Texts".format(len(dev_files.index),
-                                                                                 dev_files['wav_filesize'].sum(),
+                                                                                 dev_files['wav_filesize'].sum()/(32000*60*60),
                                                                                  dev_files['transcript'].nunique()))
 
     train_files = _generate_dataset(data_dir, "train")
     train_files.to_csv(path.join(data_dir, "voxforge-train.csv"), index=False)
     print("3.3 Train files were generated - {} Files - {} Hours - {} Texts".format(len(train_files.index),
-                                                                                   train_files['wav_filesize'].sum(),
+                                                                                   train_files['wav_filesize'].sum()/(32000*60*60),
                                                                                    train_files['transcript'].nunique()))
 
 
