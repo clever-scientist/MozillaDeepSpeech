@@ -158,6 +158,27 @@ def _download_and_preprocess_data(data_dir):
     extracter = _parallel_extracter(data_dir, number_of_test, number_of_dev, len(tarfiles), AtomicCounter())
     p.map(extracter, enumerate(tarfiles))
 
+    # Generate data set & Write them to disk as CSV files (gross)
+
+    print("3. Generating Voxforge data set into {}".format(data_dir))
+    test_files = _generate_dataset_without_Prep(data_dir, "test")
+    test_files.to_csv(path.join(data_dir, "voxforge-gross-test.csv"), index=False)
+    print("3.1 Test files were generated - {} Files - {} Hours - {} Texts".format(len(test_files.index),
+                                                                                  test_files['wav_filesize'].sum()/(32000*60*60),
+                                                                                  test_files['transcript'].nunique()))
+
+    dev_files = _generate_dataset_without_Prep(data_dir, "dev")
+    dev_files.to_csv(path.join(data_dir, "voxforge-gross-dev.csv"), index=False)
+    print("3.2 Dev files were generated - {} Files - {} Hours - {} Texts".format(len(dev_files.index),
+                                                                                 dev_files['wav_filesize'].sum()/(32000*60*60),
+                                                                                 dev_files['transcript'].nunique()))
+
+    train_files = _generate_dataset_without_Prep(data_dir, "train")
+    train_files.to_csv(path.join(data_dir, "voxforge-gross-train.csv"), index=False)
+    print("3.3 Train files were generated - {} Files - {} Hours - {} Texts".format(len(train_files.index),
+                                                                                   train_files['wav_filesize'].sum()/(32000*60*60),
+                                                                                   train_files['transcript'].nunique()))
+    
     # Generate data set & Write them to disk as CSV files
 
     print("3. Generating Voxforge data set into {}".format(data_dir))
@@ -199,6 +220,35 @@ def _generate_dataset(data_dir, data_set):
                     #transcript = unicodedata.normalize("NFKD", transcript.strip()) \
                     #    .encode("ascii", "ignore") \
                     #    .decode("ascii", "ignore")
+                    wav_file = path.join(promts_file[:-11], "wav/" + id + ".wav")
+                    if gfile.Exists(wav_file):
+                        wav_filesize = path.getsize(wav_file)
+                        # remove audios that are shorter than 0.5s and longer than 20s.
+                        # remove audios that are too short for transcript.
+                        if (wav_filesize / 32000) > 0.5 and (wav_filesize / 32000) < 20 and transcript != "" and \
+                                wav_filesize / len(transcript) > 1400:
+                            files.append((path.abspath(wav_file), wav_filesize, transcript))
+
+    return pandas.DataFrame(data=files, columns=["wav_filename", "wav_filesize", "transcript"])
+
+
+def _generate_dataset_without_Prep(data_dir, data_set):
+    extracted_dir = path.join(data_dir, data_set)
+    files = []
+    for promts_file in glob(path.join(extracted_dir + "/*/etc/", "PROMPTS")):
+        if path.isdir(path.join(promts_file[:-11], "wav")):
+            with codecs.open(promts_file, 'r', 'utf-8') as f:
+                for line in f:
+                    id = line.split(' ')[0].split('/')[-1]
+                    sentence = ' '.join(line.split(' ')[1:])
+                    sentence = sentence.strip().lower()
+
+                    transcript = ""
+                    for token in sentence.split(" "):
+                        word = token.strip()
+                        if word != "" and word != " ":
+                            transcript += word + " "
+
                     wav_file = path.join(promts_file[:-11], "wav/" + id + ".wav")
                     if gfile.Exists(wav_file):
                         wav_filesize = path.getsize(wav_file)
