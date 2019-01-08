@@ -195,9 +195,9 @@ def _generate_dataset(data_dir, data_set):
                         word = token.strip()
                         if word != "" and word != " ":
                             transcript += word + " "
-                    transcript = unicodedata.normalize("NFKD", transcript.strip()) \
-                        .encode("ascii", "ignore") \
-                        .decode("ascii", "ignore")
+                    #transcript = unicodedata.normalize("NFKD", transcript.strip()) \
+                    #    .encode("ascii", "ignore") \
+                    #    .decode("ascii", "ignore")
                     wav_file = path.join(promts_file[:-11], "wav/" + id + ".wav")
                     if gfile.Exists(wav_file):
                         wav_filesize = path.getsize(wav_file)
