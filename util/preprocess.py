@@ -44,7 +44,8 @@ def preprocess(csv_files, batch_size, numcep, numcontext, alphabet, hdf5_cache_p
             # features are stored flattened, so reshape into
             # [n_steps, (n_input + 2*n_context*n_input)]
             for i in range(len(features)):
-                features[i] = np.reshape(features[i], [features_len[i], -1])
+                #features[i] = np.reshape(features[i], [features_len[i], -1])
+                features[i] = np.reshape(features[i], [features_len[i]+2*numcontext, numcep, -1])
 
             in_data = list(zip(features, features_len,
                                transcript, transcript_len))
