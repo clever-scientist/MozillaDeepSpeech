@@ -379,19 +379,6 @@ def train(server=None):
 
     dropout_rates = [tf.placeholder(tf.float32, name='dropout_{}'.format(i)) for i in range(6)]
 
-    # Reading training set
-    train_data = preprocess(FLAGS.train_files.split(','),
-                            FLAGS.train_batch_size,
-                            Config.n_input,
-                            Config.n_context,
-                            Config.alphabet,
-                            hdf5_cache_path=FLAGS.train_cached_features_path)
-
-    train_set = DataSet(train_data,
-                        FLAGS.train_batch_size,
-                        limit=FLAGS.limit_train,
-                        next_index=lambda i: coord.get_next_index('train'))
-
     # Reading validation set
     dev_data = preprocess(FLAGS.dev_files.split(','),
                           FLAGS.dev_batch_size,
@@ -404,7 +391,20 @@ def train(server=None):
                       FLAGS.dev_batch_size,
                       limit=FLAGS.limit_dev,
                       next_index=lambda i: coord.get_next_index('dev'))
+    
+    # Reading training set
+    train_data = preprocess(FLAGS.train_files.split(','),
+                            FLAGS.train_batch_size,
+                            Config.n_input,
+                            Config.n_context,
+                            Config.alphabet,
+                            hdf5_cache_path=FLAGS.train_cached_features_path)
 
+    train_set = DataSet(train_data,
+                        FLAGS.train_batch_size,
+                        limit=FLAGS.limit_train,
+                        next_index=lambda i: coord.get_next_index('train'))
+    
     # Combining all sets to a multi set model feeder
     model_feeder = ModelFeeder(train_set,
                                dev_set,
